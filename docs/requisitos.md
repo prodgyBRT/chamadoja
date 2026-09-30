@@ -435,16 +435,550 @@ A aplicação deverá informar, por meio da documentação, os requisitos necess
 
 ## 6. Regras de negocio
 
+### RN001 — Solicitante válido
 
-## 7.Regra de Prioridade e status
+Todo chamado deverá estar associado a um usuário existente no sistema.
+
+Não será permitido criar um chamado utilizando um identificador de usuário inexistente.
+
+O usuário associado ao chamado será considerado seu solicitante.
+
+### RN002 — Categoria válida
+
+Todo chamado deverá estar associado a uma categoria existente no sistema.
+
+Não será permitido criar ou atualizar um chamado utilizando um identificador de categoria inexistente.
+
+Uma categoria poderá estar associada a vários chamados, enquanto cada chamado deverá possuir uma única categoria.
+
+### RN003 — Prioridade válida
+
+Todo chamado deverá possuir uma prioridade.
+
+As prioridades permitidas pelo sistema serão:
+
+* `baixa`;
+* `media`;
+* `alta`;
+* `urgente`.
+
+Não será permitido criar ou atualizar um chamado utilizando uma prioridade diferente das opções definidas.
+
+A prioridade deverá ser considerada nas consultas, filtros e no resumo quantitativo dos chamados.
+
+### RN004 — Status inicial do chamado
+
+Todo chamado deverá ser criado com o status `aberto`.
+
+O status inicial deverá ser definido pelo sistema no momento da criação do chamado.
+
+Não será permitido que o solicitante defina livremente o status inicial durante a abertura do chamado.
+
+### RN005 — Status permitidos
+
+Um chamado deverá possuir um dos seguintes status:
+
+* `aberto`;
+* `em_andamento`;
+* `aguardando`;
+* `resolvido`;
+* `fechado`.
+
+Não será permitido armazenar ou atribuir ao chamado um status diferente dos valores definidos pelo sistema.
+
+### RN006 — Alteração de status
+
+A alteração do status de um chamado deverá ser realizada por uma operação específica.
+
+O sistema deverá validar o novo status antes de realizar a alteração.
+
+Não será permitida a alteração de um chamado para o mesmo status que ele já possui.
+
+Toda alteração válida de status deverá gerar um registro no histórico do chamado.
+
+### RN007 — Histórico de status
+
+Cada alteração de status deverá registrar:
+
+* chamado;
+* status anterior;
+* novo status;
+* usuário responsável pela alteração;
+* data e hora da alteração.
+
+O histórico deverá preservar os registros anteriores e não deverá ser substituído quando uma nova alteração ocorrer.
+
+Dessa forma, será possível consultar a evolução do status de um chamado ao longo do tempo.
+
+### RN008 — Comentários vinculados ao chamado
+
+Todo comentário deverá estar associado a um chamado existente e a um usuário existente.
+
+O comentário deverá possuir conteúdo válido e data de criação.
+
+Um comentário não poderá existir de forma independente de um chamado.
+
+### RN009 — Integridade das categorias
+
+O nome de uma categoria deverá ser único no sistema.
+
+Não será permitido cadastrar duas categorias com o mesmo nome.
+
+Categorias que possuam chamados associados não deverão ser removidas de maneira que deixe os chamados relacionados sem uma categoria válida.
+
+### RN010 — Unicidade do e-mail
+
+O endereço de e-mail de cada usuário deverá ser único no sistema.
+
+Não será permitido cadastrar dois usuários utilizando o mesmo endereço de e-mail.
+
+O e-mail deverá ser validado antes de ser armazenado.
+
+### RN011 — Proteção das credenciais
+
+As senhas dos usuários não deverão ser armazenadas em texto puro.
+
+As senhas deverão ser armazenadas utilizando mecanismo seguro de hash.
+
+Senhas e hashes de senha não deverão ser retornados pela API.
+
+As credenciais e outras informações sensíveis de configuração não deverão ser armazenadas diretamente no código-fonte.
+
+### RN012 — Validação dos dados
+
+Os dados recebidos pela API deverão ser validados antes de serem persistidos.
+
+Campos obrigatórios deverão ser informados.
+
+Relacionamentos deverão apontar para registros existentes.
+
+Campos com valores predefinidos deverão aceitar somente os valores permitidos.
+
+Dados que não atenderem às regras definidas deverão ser rejeitados pela aplicação.
+
+### RN013 — Integridade dos relacionamentos
+
+Os relacionamentos entre usuários, categorias, chamados, comentários e históricos deverão manter a integridade dos dados.
+
+Um chamado deverá possuir um solicitante válido e uma categoria válida.
+
+Um comentário deverá possuir um chamado e um usuário válidos.
+
+Um registro de histórico deverá possuir um chamado e o usuário responsável pela alteração.
+
+As restrições do banco de dados deverão complementar as validações realizadas pela aplicação.
+
+### RN014 — Atualização de chamados
+
+A atualização de informações de um chamado deverá preservar sua identificação e seus relacionamentos.
+
+A alteração do status deverá utilizar a operação específica de alteração de status.
+
+Uma atualização não deverá remover ou modificar registros históricos já existentes.
+
+### RN015 — Consulta e filtragem
+
+Os chamados poderão ser consultados utilizando os filtros disponibilizados pela API.
+
+Os filtros inicialmente previstos serão:
+
+* status;
+* prioridade;
+* categoria.
+
+Os filtros poderão ser utilizados individualmente ou combinados.
+
+Somente valores válidos para cada filtro deverão ser aceitos.
+
+### RN016 — Paginação
+
+As consultas que retornarem múltiplos chamados deverão utilizar paginação.
+
+A quantidade de registros retornados por página deverá possuir um limite definido pela aplicação.
+
+A paginação deverá funcionar em conjunto com os filtros disponíveis.
+
+### RN017 — Resumo quantitativo
+
+O resumo quantitativo deverá representar os dados atualmente registrados no sistema.
+
+O sistema deverá permitir obter:
+
+* quantidade total de chamados;
+* quantidade por status;
+* quantidade por prioridade;
+* quantidade por categoria.
+
+Os valores deverão ser calculados a partir dos registros existentes no banco de dados.
+
+### RN018 — Recursos inexistentes
+
+Quando uma operação solicitar um usuário, categoria, chamado, comentário ou outro recurso inexistente, a operação deverá ser rejeitada.
+
+A API deverá informar adequadamente que o recurso solicitado não foi encontrado.
+
+Informações internas da aplicação não deverão ser expostas na resposta.
+
+### RN019 — Dados retornados pela API
+
+A API deverá retornar somente os dados necessários para cada operação.
+
+Informações sensíveis ou internas não deverão ser expostas.
+
+As respostas relacionadas aos usuários não deverão conter senhas ou hashes de senha.
+
+### RN020 — Configurações sensíveis
+
+Informações específicas do ambiente, como credenciais do banco de dados, deverão ser armazenadas por meio de variáveis de ambiente.
+
+O arquivo `.env` não deverá ser versionado no repositório.
+
+O arquivo `.env.example` deverá conter apenas as configurações necessárias para orientar a configuração do ambiente, sem credenciais reais.
+
+### RN021 — Histórico não destrutivo
+
+Os registros de histórico de alteração de status deverão ser preservados.
+
+Uma nova alteração de status deverá criar um novo registro, sem apagar os registros anteriores.
+
+O histórico deverá permitir reconstruir a sequência de alterações realizadas no chamado.
+
+
+### RN001 — Solicitante válido
+
+Todo chamado deverá estar associado a um usuário existente no sistema.
+
+Não será permitido criar um chamado utilizando um identificador de usuário inexistente.
+
+O usuário associado ao chamado será considerado seu solicitante.
+
+### RN002 — Categoria válida
+
+Todo chamado deverá estar associado a uma categoria existente no sistema.
+
+Não será permitido criar ou atualizar um chamado utilizando um identificador de categoria inexistente.
+
+Uma categoria poderá estar associada a vários chamados, enquanto cada chamado deverá possuir uma única categoria.
+
+### RN003 — Prioridade válida
+
+Todo chamado deverá possuir uma prioridade.
+
+As prioridades permitidas pelo sistema serão:
+
+* `baixa`;
+* `media`;
+* `alta`;
+* `urgente`.
+
+Não será permitido criar ou atualizar um chamado utilizando uma prioridade diferente das opções definidas.
+
+A prioridade deverá ser considerada nas consultas, filtros e no resumo quantitativo dos chamados.
+
+### RN004 — Status inicial do chamado
+
+Todo chamado deverá ser criado com o status `aberto`.
+
+O status inicial deverá ser definido pelo sistema no momento da criação do chamado.
+
+Não será permitido que o solicitante defina livremente o status inicial durante a abertura do chamado.
+
+### RN005 — Status permitidos
+
+Um chamado deverá possuir um dos seguintes status:
+
+* `aberto`;
+* `em_andamento`;
+* `aguardando`;
+* `resolvido`;
+* `fechado`.
+
+Não será permitido armazenar ou atribuir ao chamado um status diferente dos valores definidos pelo sistema.
+
+### RN006 — Alteração de status
+
+A alteração do status de um chamado deverá ser realizada por uma operação específica.
+
+O sistema deverá validar o novo status antes de realizar a alteração.
+
+Não será permitida a alteração de um chamado para o mesmo status que ele já possui.
+
+Toda alteração válida de status deverá gerar um registro no histórico do chamado.
+
+### RN007 — Histórico de status
+
+Cada alteração de status deverá registrar:
+
+* chamado;
+* status anterior;
+* novo status;
+* usuário responsável pela alteração;
+* data e hora da alteração.
+
+O histórico deverá preservar os registros anteriores e não deverá ser substituído quando uma nova alteração ocorrer.
+
+Dessa forma, será possível consultar a evolução do status de um chamado ao longo do tempo.
+
+### RN008 — Comentários vinculados ao chamado
+
+Todo comentário deverá estar associado a um chamado existente e a um usuário existente.
+
+O comentário deverá possuir conteúdo válido e data de criação.
+
+Um comentário não poderá existir de forma independente de um chamado.
+
+### RN009 — Integridade das categorias
+
+O nome de uma categoria deverá ser único no sistema.
+
+Não será permitido cadastrar duas categorias com o mesmo nome.
+
+Categorias que possuam chamados associados não deverão ser removidas de maneira que deixe os chamados relacionados sem uma categoria válida.
+
+### RN010 — Unicidade do e-mail
+
+O endereço de e-mail de cada usuário deverá ser único no sistema.
+
+Não será permitido cadastrar dois usuários utilizando o mesmo endereço de e-mail.
+
+O e-mail deverá ser validado antes de ser armazenado.
+
+### RN011 — Proteção das credenciais
+
+As senhas dos usuários não deverão ser armazenadas em texto puro.
+
+As senhas deverão ser armazenadas utilizando mecanismo seguro de hash.
+
+Senhas e hashes de senha não deverão ser retornados pela API.
+
+As credenciais e outras informações sensíveis de configuração não deverão ser armazenadas diretamente no código-fonte.
+
+### RN012 — Validação dos dados
+
+Os dados recebidos pela API deverão ser validados antes de serem persistidos.
+
+Campos obrigatórios deverão ser informados.
+
+Relacionamentos deverão apontar para registros existentes.
+
+Campos com valores predefinidos deverão aceitar somente os valores permitidos.
+
+Dados que não atenderem às regras definidas deverão ser rejeitados pela aplicação.
+
+### RN013 — Integridade dos relacionamentos
+
+Os relacionamentos entre usuários, categorias, chamados, comentários e históricos deverão manter a integridade dos dados.
+
+Um chamado deverá possuir um solicitante válido e uma categoria válida.
+
+Um comentário deverá possuir um chamado e um usuário válidos.
+
+Um registro de histórico deverá possuir um chamado e o usuário responsável pela alteração.
+
+As restrições do banco de dados deverão complementar as validações realizadas pela aplicação.
+
+### RN014 — Atualização de chamados
+
+A atualização de informações de um chamado deverá preservar sua identificação e seus relacionamentos.
+
+A alteração do status deverá utilizar a operação específica de alteração de status.
+
+Uma atualização não deverá remover ou modificar registros históricos já existentes.
+
+### RN015 — Consulta e filtragem
+
+Os chamados poderão ser consultados utilizando os filtros disponibilizados pela API.
+
+Os filtros inicialmente previstos serão:
+
+* status;
+* prioridade;
+* categoria.
+
+Os filtros poderão ser utilizados individualmente ou combinados.
+
+Somente valores válidos para cada filtro deverão ser aceitos.
+
+### RN016 — Paginação
+
+As consultas que retornarem múltiplos chamados deverão utilizar paginação.
+
+A quantidade de registros retornados por página deverá possuir um limite definido pela aplicação.
+
+A paginação deverá funcionar em conjunto com os filtros disponíveis.
+
+### RN017 — Resumo quantitativo
+
+O resumo quantitativo deverá representar os dados atualmente registrados no sistema.
+
+O sistema deverá permitir obter:
+
+* quantidade total de chamados;
+* quantidade por status;
+* quantidade por prioridade;
+* quantidade por categoria.
+
+Os valores deverão ser calculados a partir dos registros existentes no banco de dados.
+
+### RN018 — Recursos inexistentes
+
+Quando uma operação solicitar um usuário, categoria, chamado, comentário ou outro recurso inexistente, a operação deverá ser rejeitada.
+
+A API deverá informar adequadamente que o recurso solicitado não foi encontrado.
+
+Informações internas da aplicação não deverão ser expostas na resposta.
+
+### RN019 — Dados retornados pela API
+
+A API deverá retornar somente os dados necessários para cada operação.
+
+Informações sensíveis ou internas não deverão ser expostas.
+
+As respostas relacionadas aos usuários não deverão conter senhas ou hashes de senha.
+
+### RN020 — Configurações sensíveis
+
+Informações específicas do ambiente, como credenciais do banco de dados, deverão ser armazenadas por meio de variáveis de ambiente.
+
+O arquivo `.env` não deverá ser versionado no repositório.
+
+O arquivo `.env.example` deverá conter apenas as configurações necessárias para orientar a configuração do ambiente, sem credenciais reais.
+
+### RN021 — Histórico não destrutivo
+
+Os registros de histórico de alteração de status deverão ser preservados.
+
+Uma nova alteração de status deverá criar um novo registro, sem apagar os registros anteriores.
+
+O histórico deverá permitir reconstruir a sequência de alterações realizadas no chamado.
 
 
 
-## 8.Limites do Escopo
 
 
-## 9.Dúvidas e Hipóteses da Equipe
- 
 
+## 7. Prioridades
+
+Os chamados do sistema deverão possuir uma prioridade definida, utilizada para auxiliar na organização e no acompanhamento das solicitações.
+
+As prioridades permitidas são:
+
+* `baixa` — chamado sem urgência, que pode ser tratado posteriormente.
+* `media` — chamado que necessita de atendimento dentro do fluxo normal.
+* `alta` — chamado que necessita de atenção prioritária.
+* `urgente` — chamado que exige atendimento com maior prioridade dentro do sistema.
+
+A prioridade deverá ser informada de forma válida no cadastro ou atualização do chamado.
+
+A prioridade poderá ser utilizada nos filtros de consulta e também no resumo quantitativo dos chamados.
+
+Não serão aceitos valores diferentes dos definidos pelo sistema.
+
+## 8. Status dos Chamados
+
+Todo chamado deverá possuir um status que represente sua situação atual dentro do fluxo de atendimento.
+
+Os status permitidos pelo sistema são:
+
+* `aberto` — chamado criado e ainda não iniciado.
+* `em_andamento` — chamado está sendo atendido.
+* `aguardando` — atendimento depende de alguma informação, ação ou condição antes de continuar.
+* `resolvido` — o problema foi solucionado e o atendimento foi concluído.
+* `fechado` — chamado encerrado definitivamente.
+
+### 8.1 Status inicial
+
+Todo chamado deverá ser criado com o status `aberto`.
+
+O status inicial será definido automaticamente pelo sistema, não sendo necessário que o usuário informe esse valor durante a abertura do chamado.
+
+### 8.2 Alteração de status
+
+A alteração de status deverá ser realizada por uma operação específica do sistema.
+
+Somente valores definidos entre os status permitidos poderão ser utilizados.
+
+Não será permitido registrar uma alteração para o mesmo status que o chamado já possui.
+
+### 8.3 Histórico de alterações
+
+Cada alteração válida de status deverá gerar um registro no histórico do chamado.
+
+O histórico deverá armazenar:
+
+* chamado relacionado;
+* status anterior;
+* novo status;
+* usuário responsável pela alteração;
+* data e hora da alteração.
+
+Os registros anteriores deverão ser preservados, permitindo consultar a evolução do chamado ao longo do tempo.
+
+### 8.4 Consulta do status
+
+O status atual deverá estar disponível nas consultas dos chamados.
+
+As consultas também poderão utilizar o status como critério de filtragem e agrupamento no resumo quantitativo.
+
+## 9. Limites do Escopo
+
+O ChamadoJá será desenvolvido como uma API de gestão de chamados de suporte técnico.
+
+Nesta primeira versão, fazem parte do escopo:
+
+* cadastro e consulta de usuários;
+* cadastro e consulta de categorias;
+* abertura e consulta de chamados;
+* atualização de chamados;
+* alteração de status;
+* registro do histórico de status;
+* registro de comentários;
+* filtros e paginação de chamados;
+* resumo quantitativo dos chamados;
+* validação dos dados;
+* tratamento de erros;
+* testes automatizados das principais funcionalidades;
+* documentação da API e do projeto.
+
+Não fazem parte do escopo inicial:
+
+* aplicação web ou aplicativo mobile completo;
+* sistema de atendimento por chat em tempo real;
+* envio de mensagens por WhatsApp ou SMS;
+* integração com sistemas externos de atendimento;
+* sistema avançado de notificações;
+* inteligência artificial para classificação ou resposta automática dos chamados;
+* relatórios gráficos avançados;
+* gestão financeira ou controle de contratos de clientes.
+
+Funcionalidades adicionais poderão ser incorporadas futuramente, desde que não prejudiquem o funcionamento das funcionalidades previstas neste projeto.
+
+## 10. Dúvidas e Hipóteses
+
+Durante o desenvolvimento, algumas decisões poderão ser refinadas conforme a implementação e os testes do sistema.
+
+### 10.1 Autenticação
+
+A implementação de autenticação poderá ser realizada utilizando Laravel Sanctum, conforme a necessidade do projeto e o aprofundamento realizado durante o desenvolvimento.
+
+A necessidade de diferentes níveis de autorização entre solicitante, atendente e administrador será definida durante a implementação.
+
+### 10.2 Transições de status
+
+Os status permitidos já estão definidos, porém as regras específicas sobre quais mudanças de status serão permitidas entre cada etapa poderão ser refinadas durante o desenvolvimento.
+
+Essa decisão deverá ser registrada no diário do projeto caso seja alterada.
+
+### 10.3 Exclusão de registros
+
+As regras específicas para exclusão de usuários, categorias e demais recursos serão definidas considerando a integridade dos relacionamentos existentes.
+
+Registros que possuam dependências poderão ter sua exclusão restringida ou substituída por outra estratégia de controle.
+
+### 10.4 Evolução do projeto
+
+Caso novas necessidades sejam identificadas durante o desenvolvimento, elas deverão ser avaliadas antes de serem incorporadas ao escopo.
+
+Alterações relevantes nos requisitos ou nas decisões técnicas deverão ser registradas no diário do projeto.
 
 
