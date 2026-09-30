@@ -53,4 +53,14 @@ Executar as Migrations:Bashphp artisan migrate
 
 Iniciar o Servidor de Desenvolvimento:Bashphp artisan serve
 
-A API estará acessível em http://localhost:8000.6. Documentação ComplementarPara consultar o detalhamento de requisitos funcionais e regras de negócio, acesse docs/requisitos.md.   Para consultar o fluxo de casos de uso, acesse docs/casos-de-uso.md.   Para consultar o mapeamento completo de rotas e payloads, acesse docs/contrato-api.md.   Para verificar o histórico semanal de desenvolvimento, acesse docs/diario.md.   
+A API estará acessível em http://localhost:8000.
+
+## 6. Documentação Complementar
+
+Para consultar o detalhamento de requisitos funcionais e regras de negócio, acesse docs/requisitos.md.   
+
+Para consultar o fluxo de casos de uso, acesse docs/casos-de-uso.md.   
+
+Para consultar o mapeamento completo de rotas e payloads, acesse docs/contrato-api.md.   
+
+Para verificar o histórico semanal de desenvolvimento, acesse docs/diario.md.   

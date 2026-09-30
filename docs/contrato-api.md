@@ -28,7 +28,7 @@ Todas as requisições enviadas e respostas recebidas pela API devem utilizar o 
 ## Exemplos Detalhados de Entrada e Saída
 
 ### 1. Abrir Chamado (`POST /api/chamados`)
-> Conforme **RN004**, todo chamado nasce automaticamente com o status `aberto`.
+> Conforme **RN004**, todo chamado nasce automaticamente com o status `aberto`[span_4](start_span)[span_4](end_span)[span_5](start_span)[span_5](end_span).
 
 #### Payload de Entrada (Request Body)
 
@@ -68,8 +68,35 @@ Resposta de Erro de Validação (422 Unprocessable Content) — RF014
     ]
   }
 }
+## 2. listagem de chamados com filtros e paginação (GET/api/chamados)
 
-## 2. Alterar Status do Chamado (PATCH /api/chamados/{id}/status)
+conforme RF010 e UC005, a listagem aceita parâmetros na URL
+
+(?status+aberto&prioridade=urgente&pagina=1)
+e retorna os dados envolvidos em um envelope com metadados de paginação.
+
+reposta de sucesso (200 ok)
+
+{
+    "dados": [
+        {
+        "id": 10,
+        "solicitante_id": 1,
+        "categoria_id": 2,
+        "titulo": Impressora do setor financeiro nãi liga",
+        "status": "aberto",
+        "criado_em": "2026-09-30t10:00:00z"
+        }
+    ]
+    "meta": {
+        "pagina_atual": 1,
+        "total_paginas": 5,
+        "por_pagina": 15,
+        "total_registros": 72
+    }
+}
+
+## 3. Alterar Status do Chamado (PATCH /api/chamados/{id}/status)
 
 Conforme RN006 e RN007, altera o status e registra o histórico (status anterior, novo status, responsável e data/hora).
 
@@ -79,6 +106,7 @@ Payload de Entrada
   "usuario_id": 2,
   "status": "em_andamento"
 }
+
 Resposta de Sucesso (200 OK)
 
 {
@@ -90,7 +118,36 @@ Resposta de Sucesso (200 OK)
   "alterado_em": "2026-09-30T10:15:00Z"
 }
 
-## 3. Tratamento de Recurso Inexistente (404 Not Found) — RF015
+## 4. Consultar resumo Quantitativo (GET/api/chamados/resumo)
+
+conforme RF013 e UC009, retona métricas consolidadas por status, prioridade e categoria.
+
+Resposta de Sucesso (200 ok)
+
+{
+    "total_chamados": 45,
+    "por_status": {
+        "aberto": 12,
+        "em_andamento": 8,
+        "aguardando": 5,
+        "resolvido": 15,
+        "fechado": 5
+        },
+        "por_prioridade": {
+            "baixa": 10,
+            "media": 20,
+            "alta": 10,
+            "urgente": 5
+        },
+        "por_categoria": {
+            "hardware": 18,
+            "software": 20,
+            "redes": 7
+        }
+}
+
+
+## 5. Tratamento de Recurso Inexistente (404 Not Found) — RF015
 Exemplo ao buscar ou alterar um chamado que não existe:
 
 
